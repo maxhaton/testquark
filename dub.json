@@ -1,0 +1,19 @@
+{
+	"authors": [
+		"mhh__"
+	],
+	"configurations": [
+		{
+			"mainSourceFile": "source/testquark.d",
+			"name": "unittest",
+			"targetType": "executable"
+		}
+	],
+	"copyright": "Copyright © 2019, mhh__",
+	"dependencies": {
+		"dstats": "~>1.0.5"
+	},
+	"description": "A minimal D application.",
+	"license": "GPLv3",
+	"name": "testquark"
+}

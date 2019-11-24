@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/testquark
+testquark.so
+testquark.dylib
+testquark.dll
+testquark.a
+testquark.lib
+testquark-test-*
+*.exe
+*.o
+*.obj
+*.lst
