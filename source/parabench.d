@@ -249,31 +249,5 @@ public auto Parameterizer(Range, FuncType)(NamedBenchmark loc, Range x, FuncType
 }
 ///A simple benchmark involving specifying a sorting function
 
-import std.stdio;
 
-int[] generate(size_t x) ///Sanity cheque!
-    out(v; v.length == x)
-{
-    auto tmp = new int[x];
-    foreach (ref i; tmp)
-    {
-        import std.random;
-
-        i = uniform(int.min, int.max);
-    }
-    return tmp;
-}
-
-@Parameterizer("Measure [our new favourite] sorting algorithm", iota(1, 300), &generate)
-int[] sort(int[] data)
-{
-    import std.algorithm : sort;
-
-    return data.sort.array;
-}
-void main()
-{
-    alias them = BenchmarkInfrastructure!(No.Expose);
-    them.runAndPrint;
-}
 
