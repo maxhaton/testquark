@@ -219,7 +219,6 @@ auto runThem(BenchmarkPrototype[NamedBenchmark] theBenchmarks)
 /** Mix this in to gain the power of benchmarks, if on auto they will run on module destruction
  * 
  * Params:
- *   auto_ = Try and do it all behind the scenes
 *    expose = Expose to benchquark proper
  */
 template BenchmarkInfrastructure(Flag!"Expose" expose = No.Expose, string M = __MODULE__)
