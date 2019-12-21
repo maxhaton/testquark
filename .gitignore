@@ -13,3 +13,4 @@ testquark-test-*
 *.o
 *.obj
 *.lst
+*.a
