@@ -1,5 +1,5 @@
 ///Parameterize a benchmark
-module parabench;
+module testquark.parabench;
 import defines;
 import std.range;
 import std.traits;

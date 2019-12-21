@@ -6,10 +6,13 @@
 	"dependencies": {
 		"dstats": "~>1.0.5"
 	},
+	"configurations": [
+		{
+			"name": "library"
+		}
+	],
 	"description": "Benchmarking for D",
 	"license": "GPLv3",
 	"name": "testquark",
-	"targetType": "library",
-	"sourcePaths": ["source"],
-	"importPaths": ["source"]
+	"targetType": "library"
 }

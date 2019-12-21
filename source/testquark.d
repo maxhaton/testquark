@@ -1,4 +1,4 @@
-module testquark;
+module testquark.testquark;
 import std.stdio;
 import std.json;
 import std.algorithm;

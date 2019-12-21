@@ -1,4 +1,4 @@
-module generators;
+module testquark.generators;
 import std.traits;
 
 public:

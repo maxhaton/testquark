@@ -1,4 +1,4 @@
-module defines;
+module testquark.defines;
 import std.json;
 public struct NamedBenchmark
 {
