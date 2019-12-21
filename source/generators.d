@@ -35,7 +35,7 @@ F[] normalFloats(F)(ulong n, F mu, F sigma)
     out(o; o.length == n)
 {
     import std.mathspecial;
-    auto tmp = new F[x];
+    auto tmp = new F[n];
     foreach (ref i; tmp)
     {
         import std.random;
@@ -48,12 +48,13 @@ F[] normalFloats(F)(ulong n, F mu, F sigma)
 ///
 @safe unittest 
 {
+    import std.stdio : writeln;
     const y = normalFloats!float(200, 3.14159, 1);
     float tmp = 0;
 
     foreach(g; y)
         tmp += g;
-    writeln(tmp / g);
+    writeln(tmp / 200);
 }
 /++
     Generate data in order in [min, max$(RPAREN) (in "steps").
