@@ -2,17 +2,25 @@
 	"authors": [
 		"mhh__"
 	],
+	"configurations": [
+		{
+			"name": "library",
+			"targetType": "sourceLibrary"
+		}
+	],
 	"copyright": "Copyright © 2019, mhh__",
 	"dependencies": {
 		"dstats": "~>1.0.5"
 	},
-	"configurations": [
-		{
-			"name": "library"
-		}
-	],
 	"description": "Benchmarking for D",
+	"importPaths": [
+		"source/"
+	],
 	"license": "GPLv3",
 	"name": "testquark",
-	"targetType": "library"
+	"sourcePaths": [
+		"source/"
+	],
+	"targetType": "library",
+	"version": "0.0.5"
 }

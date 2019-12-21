@@ -11,7 +11,7 @@ public:
     if(isNumeric!T)
     out(o; o.length == n)
 {
-    auto tmp = new T[x];
+    auto tmp = new T[n];
     foreach (ref i; tmp)
     {
         import std.random;
@@ -61,8 +61,7 @@ F[] normalFloats(F)(ulong n, F mu, F sigma)
     Reason: Being nice to the branch predictor (A/B testing).
                     
 +/
-T[] inorderDataArray(T)(ulong n, T min, T max, T step)
-    out(o; o.length == n)
+T[] inorderDataArray(T)(T min, T max, T step)
 {
     import std.range : iota, array;
     return iota(min, max, step).array;
