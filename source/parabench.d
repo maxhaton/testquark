@@ -1,11 +1,12 @@
 ///Parameterize a benchmark
 module testquark.parabench;
-import testquark.defines;
+//An unfortunate requirement.
+public import testquark.defines;
 import std.range;
 import std.traits;
 import std.typecons;
 import std.json;
-
+import std.stdio;
 /** Define a way of providing testing data to a benchmark,
  *  i.e. stop the compiler DFAing the magic away. It must be 
  *  parameterized by a size_t such that it can be measured.
@@ -56,50 +57,16 @@ interface BenchmarkPrototype : InputRange!(Operation)
     const size_t iterationsPerMeasurement();
 }
 
-
-auto MarkImpl(alias mod)(ref BenchmarkPrototype[NamedBenchmark] map)
+auto godawfulHack(RetType_, RangeType_, FuncType_, Operation_, alias Item_, I, J, K, L)(I x, J y, K z, L fuck)
 {
-    
-    void register(NamedBenchmark key, BenchmarkPrototype set)
-    {   
-        map[key] = set;
-    }
-    foreach (sItem; __traits(allMembers, mod))
-    {
-        
-        import std.stdio;
-
-        alias Item = __traits(getMember, mod, sItem);
-        const theAttributes = __traits(getAttributes, Item);
-        //pragma(msg, sItem, " ", theAttributes.length);
-        //No attributes 
-        static if (theAttributes.length & isCallable!Item)
-        {
-            
-            foreach (attr; theAttributes)
-            {
-                if (is(typeof(attr) : Template!Args, alias Template, Args...))
-                {
-                    if (__traits(isSame, Template, ParameterizerStruct))
-                    {
-                        //pragma(msg, attr);
-                        //pragma(msg, Args);
-                        alias RangeType = Args[0];
-                        alias FuncType = Args[1];
-
-                        alias RetType = ReturnType!FuncType;
-                        //pragma(msg, sItem);
-                        static assert(__traits(isSame, RetType, Parameters!Item[0]),
-                                "Functioning being benchmarked is not callable with data provided by parameterizer");
-
-                        register(attr.loc, new class (attr.loc, attr.store, attr.func, &Item) BenchmarkPrototype
+    return new class (x, y, z, fuck) BenchmarkPrototype
                         {
-                            RetType actOnThisData;
-                            RangeType theRange;
-                            FuncType theFunction;
-                            Operation current;
+                            RetType_ actOnThisData;
+                            RangeType_ theRange;
+                            FuncType_ theFunction;
+                            Operation_ current;
                             NamedBenchmark loc;
-                            typeof(&Item) benchFunc;
+                            typeof(&Item_) benchFunc;
                             @property Operation front()
                             {
                                 return current;
@@ -156,7 +123,7 @@ auto MarkImpl(alias mod)(ref BenchmarkPrototype[NamedBenchmark] map)
                                 
                             }
 
-                            this(NamedBenchmark sLoc, RangeType set, FuncType task, typeof(&Item) setB)
+                            this(NamedBenchmark sLoc, RangeType_ set, FuncType_ task, typeof(&Item_) setB)
                             {
                                 theFunction = task;
                                 theRange = set;
@@ -165,7 +132,45 @@ auto MarkImpl(alias mod)(ref BenchmarkPrototype[NamedBenchmark] map)
                                 benchFunc = setB;
                                 generateData;
                             }
-                        });
+                        };
+}
+auto MarkImpl(alias mod)(ref BenchmarkPrototype[NamedBenchmark] map)
+{
+    
+    void register(NamedBenchmark key, BenchmarkPrototype set)
+    {   
+        map[key] = set;
+    }
+    foreach (sItem; __traits(allMembers, mod))
+    {
+        
+        import std.stdio;
+
+        alias Item = __traits(getMember, mod, sItem);
+        const theAttributes = __traits(getAttributes, Item);
+        //pragma(msg, sItem, " ", theAttributes.length);
+        //No attributes 
+        static if (theAttributes.length & isCallable!Item)
+        {
+            
+            foreach (attr; theAttributes)
+            {
+                if (is(typeof(attr) : Template!Args, alias Template, Args...))
+                {
+                    if (__traits(isSame, Template, ParameterizerStruct))
+                    {
+                        //pragma(msg, attr);
+                        //pragma(msg, Args);
+                        alias RangeType = Args[0];
+                        alias FuncType = Args[1];
+
+                        alias RetType = ReturnType!FuncType;
+                        //pragma(msg, sItem);
+                        static assert(__traits(isSame, RetType, Parameters!Item[0]),
+                                "Functioning being benchmarked is not callable with data provided by parameterizer");
+                        {
+                        register(attr.loc, godawfulHack!(RetType, RangeType, FuncType, Operation, Item, typeof(attr.loc), typeof(attr.store), typeof(attr.func), typeof(&Item))(attr.loc, attr.store, attr.func, &Item));
+                        }
                     }
                 }
 
@@ -204,9 +209,9 @@ auto runThem(BenchmarkPrototype[NamedBenchmark] theBenchmarks)
         }
 
         //writeln(theBenchmarks.length);
-        
+        //theBenchmarks.length
         ulong index = 0;
-        auto tmp = JSONValue([index]);
+        auto tmp = JSONValue(iota(index, theBenchmarks.length + 1).array);
         foreach (NamedBenchmark key, value; theBenchmarks)
         {
             
