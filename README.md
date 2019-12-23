@@ -1,5 +1,5 @@
 # testquark
-This is a nearly-finished benchmarking framework. 
+This is a benchmarking framework. 
 Use as follows
 ```
 int[] generate(size_t x) ///Sanity cheque!
@@ -29,3 +29,7 @@ int[] sort(int[] data)
 
 You will soon be able to use benchquark to measure performance counters of your benchmarks (e.g. cache, Instructions executed and 
 what the branch predictors been up to) by choosing `Yes.Expose`
+
+## Using PAPI: 
+    Pass Yes.UsePapi to runAndPrint(). You must link PAPI 5 in some way, i.e. in "libs" in dub.json or `pragma(lib, "papi")'. 
+PAPI 5 can be obtained through apt. 
