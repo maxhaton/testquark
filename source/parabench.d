@@ -181,27 +181,68 @@ auto MarkImpl(alias mod)(ref BenchmarkPrototype[NamedBenchmark] map)
     return map;
 }
 
-auto runThem(BenchmarkPrototype[NamedBenchmark] theBenchmarks)
+
+pragma(lib, "papi");
+
+auto runThem(Flag!"UsePapi" usePapi = Yes.UsePapi)(BenchmarkPrototype[NamedBenchmark] theBenchmarks, Flag!"FullData" fullDataView = No.FullData)
 {
+        static if(usePapi)
+        {
+            pragma(msg, "Link with PAPI 5 for this to work, pragma(lib, \"papi\") should work\nSet a very low perf_paranoid");
+            //pragma(lib, "papi");
+        }
         JSONValue runBenchmark(BenchmarkPrototype bench)
             in(bench !is null, "Null pointer")
         {
-            
+            import std.conv : to;
             ulong[string][string] data;
             foreach (pair; bench)
             {
-                //writeln(pair);
+                long totalMeasured = 0;
                 foreach (i; 0 .. bench.iterationsPerMeasurement)
                 {
-                    import std.conv : to;
+                    
                     import std.datetime.stopwatch : StopWatch;
+                    static if (usePapi) {
+                        import testquark.papi;
+                        import testquark.papiStdEventDefs;
 
-                    auto sw = StopWatch(No.autoStart);
-                    sw.start();
-                    pair.runIt();
-                    sw.stop();
-                    data[pair.size.to!string][i.to!string] = sw.peek.total!"usecs";
+                        enum numCounters = 1;
+                        long[numCounters] values;
+
+                        int[numCounters] eventSet = [PAPI_TOT_INS];
+
+                        if (PAPI_start_counters(eventSet.ptr, numCounters) != PAPI_OK)
+                            assert(0, "Papi Initialization failed");
+                        
+                        pair.runIt();
+                        //if (PAPI_read_counters(values.ptr, numCounters) != PAPI_OK)
+                                //assert(0, "Failed reading counters");
+                        
+                        if (PAPI_stop_counters(values.ptr, numCounters) != PAPI_OK)
+                            assert(0, "Failing stopping counters?!");
+
+                        const long measured = values[0];
+                    } else {
+                        auto sw = StopWatch(No.autoStart);
+                        sw.start();
+                        pair.runIt();
+                        sw.stop();
+                        const long measured = sw.peek.total!"usecs";
+                    }
+                    
+                    totalMeasured += measured;
+                    if(fullDataView)
+                        data[pair.size.to!string][i.to!string] = measured;
                 }
+                static if (usePapi)
+                {
+                    enum name = "meaninstructions";
+                }
+                else {
+                     enum name = "meanUsecs";
+                }
+                data[pair.size.to!string][name] =  cast(ulong) (cast(float) totalMeasured / bench.iterationsPerMeasurement);
 
             }
 
@@ -233,10 +274,10 @@ template BenchmarkInfrastructure(Flag!"Expose" expose = No.Expose, string M = __
     {
         benchmarks = MarkImpl!(mixin(M))(benchmarks);
     }
-    void runAndPrint()
+    void runAndPrint(Flag!"UsePapi" usePapi)()
     {
         setup();
-        runThem(benchmarks).toPrettyString.writeln;
+        runThem!usePapi(benchmarks).toPrettyString.writeln;
     }
 }
 
@@ -252,6 +293,7 @@ public auto Parameterizer(Range, FuncType)(NamedBenchmark loc, Range x, FuncType
     return ParameterizerStruct!(Range, FuncType)(loc, x, func);
 }
 ///A simple benchmark involving specifying a sorting function
+
 
 
 
